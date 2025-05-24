@@ -13,6 +13,10 @@ struct ContentView: View {
     
     @FetchRequest<Pokemon>(
         sortDescriptors: [SortDescriptor(\.id)],
+        animation: .default) private var allPokemons
+    
+    @FetchRequest<Pokemon>(
+        sortDescriptors: [SortDescriptor(\.id)],
         animation: .default) private var pokedex
     
     private var dynamicPredicate : NSPredicate{
@@ -43,7 +47,7 @@ struct ContentView: View {
 
     var body: some View {
         
-        if pokedex.isEmpty {
+        if allPokemons.isEmpty {
             
             ContentUnavailableView {
                 Label("No Pokemons Found", image: .nopokemon)
@@ -100,11 +104,18 @@ struct ContentView: View {
                                     }
                                     
                                 }
-                            }
+                            }.swipeActions (edge:.leading){
+                                Button(pokemon.favourite ? "Remove from favourites" : "Add to favourites", systemImage: "star"){
+                                    pokemon.favourite.toggle()
+                                }
+
+                            }.tint(pokemon.favourite ? .yellow : .gray)
+                            
                         }
+                        
                     }footer:{
                         
-                        if pokedex.count < 151{
+                        if allPokemons.count < 151{
                             ContentUnavailableView {
                                 Label("Missing Pokemon", image: .nopokemon)
                             }description: {
