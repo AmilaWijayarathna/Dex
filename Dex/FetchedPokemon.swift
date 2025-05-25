@@ -65,6 +65,12 @@ struct FetchedPokemon : Decodable {
             
         }
         
+        if decodeTypes.count == 2 && decodeTypes[0] == "normal"{
+//            decodeTypes[0] = decodeTypes[1]
+//            decodeTypes[1] = "normal"
+            decodeTypes.swapAt(1, 0)
+        }
+        
         self.types = decodeTypes
         
         var decodedStats : [Int16] = []
