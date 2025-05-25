@@ -7,6 +7,7 @@
 
 import Foundation
 
+@MainActor
 struct FetchService{
     
     
@@ -17,7 +18,7 @@ struct FetchService{
     
     private let baseUrl = URL(string: "https://pokeapi.co/api/v2/pokemon")
     
-    func fetchPokemon(_ id: Int) async throws -> FetchedPokemon {
+    func fetchPokemon(_ id: Int) async throws -> Pokemon {
         
         let fetchUrl = baseUrl?.appending(path : String(id))
         
@@ -31,7 +32,7 @@ struct FetchService{
         
         decoder.keyDecodingStrategy = .convertFromSnakeCase
         
-        let pokemon = try decoder.decode(FetchedPokemon.self, from: data)
+        let pokemon = try decoder.decode(Pokemon.self, from: data)
         
         print("fetched Pokemon \(pokemon.id) : \(pokemon.name.capitalized)")
         return pokemon
