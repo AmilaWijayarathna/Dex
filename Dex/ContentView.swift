@@ -67,14 +67,22 @@ struct ContentView: View {
                     Section{
                         ForEach(pokedex) { pokemon in
                             NavigationLink(value : pokemon){
-                                AsyncImage(url: pokemon.sprite){ image in
-                                    image
+                                
+                                if pokemon.sprite == nil{
+                                    AsyncImage(url: pokemon.spriteURL){ image in
+                                        image
+                                            .resizable()
+                                            .scaledToFit()
+                                    }placeholder: {
+                                        ProgressView()
+                                    }
+                                    .frame(width: 100, height: 100)
+                                }else{
+                                    pokemon.spriteImage
                                         .resizable()
                                         .scaledToFit()
-                                }placeholder: {
-                                    ProgressView()
                                 }
-                                .frame(width: 100, height: 100)
+                            
                                 
                                 VStack(alignment: .leading) {
                                     
@@ -175,8 +183,8 @@ struct ContentView: View {
                     pokemon.specialAttack = fethedPokemon.specialAttack
                     pokemon.specialDefence = fethedPokemon.specialDefence
                     pokemon.speed = fethedPokemon.speed
-                    pokemon.sprite = fethedPokemon.sprite
-                    pokemon.shiny = fethedPokemon.shiny
+                    pokemon.spriteURL = fethedPokemon.spriteURL
+                    pokemon.shinyURL = fethedPokemon.shinyURL
                     
                     if pokemon.id % 2 == 0{
                         pokemon.favourite = true
@@ -187,8 +195,31 @@ struct ContentView: View {
                     print(error)
                 }
             }
+            
+            storeSprites()
         }
         
+    }
+    
+    private func storeSprites(){
+        
+        Task {
+            do{
+                for pokemon in allPokemons{
+                   
+                    pokemon.sprite = try! await URLSession.shared.data(from: pokemon.spriteURL!).0
+                    
+                    pokemon.shiny = try! await URLSession.shared.data(from: pokemon.shinyURL!).0
+                    try viewContext.save()
+                    
+                    print("saved\(pokemon.name)")
+                }
+            }catch {
+                print(error)
+            }
+        }
+        
+       
     }
 
     
